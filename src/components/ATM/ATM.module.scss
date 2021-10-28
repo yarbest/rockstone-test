@@ -1,0 +1,26 @@
+.numpad {
+    max-width: 500px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 3fr);
+}
+
+.numpadItem {
+    padding: 5px;
+    margin: 5px;
+    cursor: pointer;
+    text-align: center;
+    background-color: lightgray;
+    border: 1px solid #000;
+}
+
+.inputWrapper {
+    text-align: center;
+}
+
+.input {
+    margin: 20px;
+    padding: 5px;
+    font-size: 24px;
+    border: 1px solid #000;
+}
