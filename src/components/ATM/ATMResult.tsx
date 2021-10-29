@@ -1,34 +1,27 @@
 import React from 'react';
+// import { IBanknotes } from '../../types/ATMTypes';
 
 interface IATMResult {
+    // atmResult: [IBanknotes, string, IBanknotes];
     atmResult: any;
+    amountOfMoneyLeft: number;
 }
 
-const ATMResult = ({ atmResult }: IATMResult) => {
+const ATMResult = ({ atmResult, amountOfMoneyLeft }: IATMResult) => {
     return (
         <div>
             <div>
                 Withdrawn:
-                {Object.keys(atmResult[0]).map((banknote) => {
+                {Object.keys(atmResult).map((banknote, i) => {
                     return (
-                        <p>
-                            banknote: {banknote}, amount: {atmResult[0][banknote]}
+                        <p key={i}>
+                            banknote: {banknote}, amount: {atmResult[banknote]}
                         </p>
                     );
                 })}
-                Couldn't withdraw: {atmResult[1]}
+                {+amountOfMoneyLeft ? 'Couldn"t withdraw: ' + amountOfMoneyLeft : null}
             </div>
             <hr />
-            <div>
-                Left in ATM:
-                {Object.keys(atmResult[2]).map((banknote) => {
-                    return (
-                        <p>
-                            banknote: {banknote}, amount: {atmResult[2][banknote]}
-                        </p>
-                    );
-                })}
-            </div>
         </div>
     );
 };

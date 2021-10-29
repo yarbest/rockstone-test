@@ -1,54 +1,47 @@
-// (купюры 5000= 100; 2000= 400; 1000= 1000; 500= 3000; 200= 5000; 100= 8000;
-// 50= 10000)
+// import { IBanknotes } from '../types/ATMTypes';
 
-//количество выдаваемых купюр и остаток
-//справки, в которой будет информация сколько купюр каждого вида осталось;
+//эта функция показывает сколько и какого типа банкнот было выдано
+const getGivenBanknotesWithTheirFrequency = (givenBanknotesArr: string[]) => {
+    return givenBanknotesArr.reduce((acum: any, banknote) => {
+        if (banknote in acum) acum[banknote] += 1;
+        else acum[banknote] = 1;
+        return acum;
+    }, {});
+};
 
-export const ATMLogic = (amount: number): [any, string, any] => {
-    // let amount = 53111.22;
-    const amountOfBanknotes: any = {
-        5000: 100,
-        2000: 400,
-        1000: 1000,
-        500: 3000,
-        200: 5000,
-        100: 8000,
+const getBanknoteWithBiggestAmount = (amountOfBanknotes: any, prevMaxBanknote?: any) => {
+    let maxBanknote: any = 0;
+    Object.keys(amountOfBanknotes).forEach((el, i, arr) => {
+        if (maxBanknote === 0) maxBanknote = arr[0];
+        else if (amountOfBanknotes[el] > amountOfBanknotes[maxBanknote] && el !== prevMaxBanknote && amountOfBanknotes[maxBanknote] > 0)
+            maxBanknote = el;
+    });
+    return maxBanknote;
+};
+
+const calcHowMuchWasWithdrawn = (amount: any, amountOfBanknotes: any) => {
+    let maxBanknote: any = getBanknoteWithBiggestAmount(amountOfBanknotes);
+    const arrOfGivenBanknotes = [];
+    while (amount > 0) {
+        maxBanknote = maxBanknote > amount ? getBanknoteWithBiggestAmount(amountOfBanknotes, maxBanknote) : maxBanknote;
+
+        console.log(maxBanknote);
+        amount -= maxBanknote;
+        amountOfBanknotes[maxBanknote] = amountOfBanknotes[maxBanknote] - 1;
+        arrOfGivenBanknotes.push(maxBanknote);
+    }
+
+    return { arrOfGivenBanknotes, amount };
+};
+
+export const ATMLogic = (amount: number, amountOfBanknotes: any): any => {
+    const { arrOfGivenBanknotes, amount: moneyCouldntWithdraw }: any = calcHowMuchWasWithdrawn(amount, amountOfBanknotes);
+
+    const givenBanknotesWithTheirFrequency = getGivenBanknotesWithTheirFrequency(arrOfGivenBanknotes);
+
+    return {
+        givenBanknotesToUser: givenBanknotesWithTheirFrequency,
+        moneyLeft: moneyCouldntWithdraw.toFixed(2),
+        amountOfBanknotesInATM: amountOfBanknotes,
     };
-
-    let arrOfGivenBanknotes: string[] = [];
-
-    const ATM = () => {
-        if (amount < 100) return arrOfGivenBanknotes;
-
-        Object.keys(amountOfBanknotes)
-            .reverse()
-            .forEach((banknote: string) => {
-                if (amount >= Number(banknote)) {
-                    amountOfBanknotes[banknote] = amountOfBanknotes[banknote] - 1;
-                    amount -= Number(banknote);
-                    arrOfGivenBanknotes.push(banknote);
-                }
-            });
-
-        arrOfGivenBanknotes = amount > 0 ? ATM() : arrOfGivenBanknotes;
-        return arrOfGivenBanknotes;
-    };
-
-    const getGivenBanknotes = (givenBanknotesArr: string[]) => {
-        return givenBanknotesArr.reduce((acum: any, banknote) => {
-            if (banknote in acum) acum[banknote] += 1;
-            else acum[banknote] = 1;
-            return acum;
-        }, {});
-    };
-
-    const givenBanknotesArr1 = ATM();
-    const givenBanknotes1 = getGivenBanknotes(givenBanknotesArr1);
-
-    // const [givenBanknotesArr2, left2] = ATM(57011)
-    // const givenBanknotes2 = getGivenBanknotes(givenBanknotesArr2)
-
-    // console.log(givenBanknotes1, 'left', amount.toFixed(2));
-    // console.log(givenBanknotes2, left2)
-    return [givenBanknotes1, amount.toFixed(2), amountOfBanknotes];
 };
