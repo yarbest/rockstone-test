@@ -1,9 +1,8 @@
 import React from 'react';
-// import { IBanknotes } from '../../types/ATMTypes';
+import { IBanknotes } from '../../types/ATMTypes';
 
 interface IATMResult {
-    // atmResult: [IBanknotes, string, IBanknotes];
-    atmResult: any;
+    atmResult: IBanknotes;
     amountOfMoneyLeft: number;
 }
 
@@ -19,9 +18,8 @@ const ATMResult = ({ atmResult, amountOfMoneyLeft }: IATMResult) => {
                         </p>
                     );
                 })}
-                {+amountOfMoneyLeft ? 'Couldn"t withdraw: ' + amountOfMoneyLeft : null}
+                <p>{+amountOfMoneyLeft ? 'Couldn"t withdraw: ' + amountOfMoneyLeft : null}</p>
             </div>
-            <hr />
         </div>
     );
 };

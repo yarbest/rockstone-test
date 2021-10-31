@@ -1,10 +1,10 @@
 import React from 'react';
+import { IBanknotes } from '../../types/ATMTypes';
 import styles from './ATM.module.scss';
 
 interface IATMInfo {
-    // atmResult: [IBanknotes, string, IBanknotes];
-    atmResult: any;
-    onAtmInfoClose: any;
+    atmResult: IBanknotes;
+    onAtmInfoClose: () => void;
 }
 
 const ATMInfo = ({ atmResult, onAtmInfoClose }: IATMInfo) => {

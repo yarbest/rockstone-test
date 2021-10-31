@@ -24,6 +24,7 @@ const Numpad = ({ handleInputFromNumpad }: INumpad) => {
             <div className={styles.numpadItem}>2</div>
             <div className={styles.numpadItem}>3</div>
             <div className={styles.numpadItem}>0</div>
+            <div className={styles.numpadItem}>.</div>
             <div className={styles.numpadItem}>{'Clear'}</div>
             <div className={styles.numpadItem}>{'Withdraw'}</div>
         </div>
