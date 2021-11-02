@@ -1,43 +1,36 @@
 import { IBanknotes } from '../types/ATMTypes';
 
-const getBanknoteWithBiggestAmount = (amountOfBanknotes: IBanknotes) => {
-    const biggestAmount = Math.max(...Object.entries(amountOfBanknotes).map((el: [string, number]) => +el[0] * el[1]));
-    return Object.keys(amountOfBanknotes).find((key: string) => +key * amountOfBanknotes[key] === biggestAmount);
-};
+const calcHowMuchWasWithdrawn = (amount: number, amountOfBanknotes: IBanknotes, arrOfGivenBanknotes: string[]): any => {
+    if (amount < 50) return { arrOfGivenBanknotes, amount };
 
-const getValidBanknoteWithBiggestAmount = (maxBanknote: string | undefined, amount: number, amountOfBanknotes: IBanknotes) => {
-    const copy = { ...amountOfBanknotes };
-    while (+maxBanknote! > amount) {
-        delete copy[maxBanknote!];
-        maxBanknote = getBanknoteWithBiggestAmount(copy);
-    }
-    return maxBanknote;
-};
+    let amountOfBanknotesEnded = 0; //this varriable shows, how many of banknotes has quantity zero
+    Object.keys(amountOfBanknotes)
+        .reverse()
+        .forEach((banknote: string) => {
+            if (amountOfBanknotes[banknote] <= 0) {
+                amountOfBanknotesEnded++;
+                return;
+            }
+            if (amount >= Number(banknote)) {
+                amountOfBanknotes[banknote] = amountOfBanknotes[banknote] - 1;
+                amount -= Number(banknote);
+                arrOfGivenBanknotes.push(banknote);
+            }
+        });
 
-const calcHowMuchWasWithdrawn = (amount: number, amountOfBanknotes: IBanknotes): any => {
-    const minimalBanknote = Math.min(...Object.keys(amountOfBanknotes).map((el) => +el));
-    const arrOfGivenBanknotes: string[] = [];
-    let maxBanknote: string | undefined = getBanknoteWithBiggestAmount(amountOfBanknotes);
-    maxBanknote = getValidBanknoteWithBiggestAmount(maxBanknote, amount, amountOfBanknotes);
-
-    while (amount - +maxBanknote! >= 0 || amount > minimalBanknote) {
-        maxBanknote = getValidBanknoteWithBiggestAmount(maxBanknote, amount, amountOfBanknotes);
-
-        if (maxBanknote === undefined || amountOfBanknotes[maxBanknote] === 0) break;
-
-        amount -= +maxBanknote!;
-        amountOfBanknotes[maxBanknote] = amountOfBanknotes[maxBanknote] - 1;
-        arrOfGivenBanknotes.push(maxBanknote);
-    }
+    if (amountOfBanknotesEnded >= Object.keys(amountOfBanknotes).length) return { arrOfGivenBanknotes, amount };
+    if (amount > 0) ({ arrOfGivenBanknotes, amount } = calcHowMuchWasWithdrawn(amount, amountOfBanknotes, arrOfGivenBanknotes));
 
     return { arrOfGivenBanknotes, amount };
 };
 
 export const ATMLogic = (amount: number, amountOfBanknotes: IBanknotes) => {
-    const { arrOfGivenBanknotes, amount: moneyCouldntWithdraw } = calcHowMuchWasWithdrawn(amount, amountOfBanknotes);
+    let givenBanknotesToUser: string[] = [];
+    const { arrOfGivenBanknotes, amount: moneyCouldntWithdraw } = calcHowMuchWasWithdrawn(amount, amountOfBanknotes, []);
+    givenBanknotesToUser = arrOfGivenBanknotes;
 
     return {
-        givenBanknotesToUser: getGivenBanknotesWithTheirFrequency(arrOfGivenBanknotes),
+        givenBanknotesToUser: getGivenBanknotesWithTheirFrequency(givenBanknotesToUser),
         moneyLeft: moneyCouldntWithdraw.toFixed(2),
         amountOfBanknotesInATM: amountOfBanknotes,
     };
