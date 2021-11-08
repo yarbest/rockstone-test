@@ -1,25 +1,29 @@
 import { IBanknotes } from '../types/ATMTypes';
 
-const calcHowMuchWasWithdrawn = (amount: number, amountOfBanknotes: IBanknotes, arrOfGivenBanknotes: string[]): any => {
-    if (amount < 50) return { arrOfGivenBanknotes, amount };
-
-    let amountOfBanknotesEnded = 0; //this varriable shows, how many of banknotes has quantity zero
-    Object.keys(amountOfBanknotes)
+const getBanknoteWithBiggestAmount = (amountOfBanknotes: IBanknotes) => {
+    const biggestAmount = Math.max(...Object.values(amountOfBanknotes));
+    return Object.keys(amountOfBanknotes)
         .reverse()
-        .forEach((banknote: string) => {
-            if (amountOfBanknotes[banknote] <= 0) {
-                amountOfBanknotesEnded++;
-                return;
-            }
-            if (amount >= Number(banknote)) {
-                amountOfBanknotes[banknote] = amountOfBanknotes[banknote] - 1;
-                amount -= Number(banknote);
-                arrOfGivenBanknotes.push(banknote);
-            }
-        });
+        .find((key: string) => amountOfBanknotes[key] === biggestAmount);
+};
 
-    if (amountOfBanknotesEnded >= Object.keys(amountOfBanknotes).length) return { arrOfGivenBanknotes, amount };
-    if (amount > 0) ({ arrOfGivenBanknotes, amount } = calcHowMuchWasWithdrawn(amount, amountOfBanknotes, arrOfGivenBanknotes));
+const calcHowMuchWasWithdrawn = (amount: number, amountOfBanknotes: IBanknotes, arrOfGivenBanknotes: string[]): any => {
+    let maxBanknoteAmount = getBanknoteWithBiggestAmount(amountOfBanknotes) as string;
+    while (amount > 0) {
+        maxBanknoteAmount = getBanknoteWithBiggestAmount(amountOfBanknotes) as string;
+        let copy = { ...amountOfBanknotes };
+        while (Number(maxBanknoteAmount) > amount || amountOfBanknotes[maxBanknoteAmount] <= 0) {
+            delete copy[maxBanknoteAmount];
+            //сорян конечно за сложность алгоритма O(n^3), но иначе никак
+            maxBanknoteAmount = getBanknoteWithBiggestAmount(copy) as string;
+            if (Object.keys(copy).length === 0) break;
+        }
+        if (amount >= Number(maxBanknoteAmount)) {
+            amountOfBanknotes[maxBanknoteAmount] = amountOfBanknotes[maxBanknoteAmount] - 1;
+            amount -= Number(maxBanknoteAmount);
+            arrOfGivenBanknotes.push(maxBanknoteAmount);
+        } else break;
+    }
 
     return { arrOfGivenBanknotes, amount };
 };
